@@ -1,3 +1,13 @@
+# Article Creator
+## Purpose
+An internal tool for UCL Fintech Society to create relevant, impacting, and engaging short form Linkedin-content.
+## How it works
+The user selects articles fetched from NewsAPI
+OpenAI model generates short recap from articles
+The user copies the article to their clipboard and shares it to their socials
+
+Boilerplate Next.JS Readme Below:
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
