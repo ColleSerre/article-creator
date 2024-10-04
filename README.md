@@ -1,11 +1,14 @@
 # Article Creator
+
 ## Purpose
+
 An internal tool for UCL Fintech Society to create relevant, impacting, and engaging short form Linkedin-content.
 
 At UCL Fintech Society, we have the ambition to go from the largest Fintech Society in Europe to the strongest network for project builders and business people in Finance. To grow our reach with professionals we want to become a reputable and trusted source for Fintech news. This led us to compromise between speed and quality with this half-automated half-manual approach to creating our daily news digest.
 
 ## How it works
-The user selects articles fetched from NewsAPI
+
+The user selects articles fetched from [NewsCatcher API](https://www.newscatcherapi.com/)
 OpenAI model generates short recap from articles
 The user copies the article to their clipboard and shares it to their socials
 

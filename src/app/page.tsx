@@ -6,19 +6,24 @@ import ClientComponent from "./ClientComponent";
 async function getArticles() {
   // Fetch articles from the News API
 
+  if (!process.env.NEXT_PUBLIC_NEWS_API_KEY) {
+    throw new Error("News API key not found");
+  }
+
   // Technology
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const technologyPromise = fetch(
-    `https://newsapi.org/v2/top-headlines?country=us&category=technology&sortBy=popularity&apiKey=99e5ac3b58484d54a3ada3f0da642e53`
+    `https://newsapi.org/v2/top-headlines?country=us&category=technology&sortBy=popularity&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`
   );
 
   // Business
   const businessPromise = fetch(
-    `https://newsapi.org/v2/top-headlines?country=us&category=business&sortBy=popularity&apiKey=99e5ac3b58484d54a3ada3f0da642e53`
+    `https://newsapi.org/v2/top-headlines?country=us&category=business&sortBy=popularity&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`
   );
 
   // Fintech
   const fintechPromise = fetch(
-    `https://newsapi.org/v2/everything?q=fintech&from=2024-09-21&sortBy=popularity&language=en&apiKey=99e5ac3b58484d54a3ada3f0da642e53`
+    `https://newsapi.org/v2/everything?q=fintech&from=2024-09-21&sortBy=popularity&language=en&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`
   );
 
   const [businessRes, fintechRes] = await Promise.all([
@@ -26,20 +31,11 @@ async function getArticles() {
     fintechPromise,
   ]);
 
-  if (!businessRes.ok || !fintechRes.ok) {
-    throw new Error("Failed to fetch articles");
-  }
+  const responses = [businessRes, fintechRes];
+  const validResponses = responses.filter((res) => res.ok);
 
-  const [businessData, fintechData] = await Promise.all([
-    businessRes.json(),
-    fintechRes.json(),
-  ]);
-
-  const articles = [businessData.articles, fintechData.articles]
-    .flat()
-    .filter(
-      (article) => article.urlToImage && article.title && article.description
-    )
+  const articles = (await Promise.all(validResponses.map((res) => res.json())))
+    .flatMap((data) => data.articles)
     .removeDuplicates()
     .randomize();
 

@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 export interface Article {
@@ -21,10 +20,9 @@ export interface Article {
 interface CardProps {
   article: Article;
   onArticleClick: (article: Article) => void;
-  selected?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({ article, onArticleClick, selected }) => (
+const Card: React.FC<CardProps> = ({ article, onArticleClick }) => (
   <div className="flex flex-row bg-gray-800 mb-4">
     <div className="flex flex-col justify-between h-full p-4 overflow-hidden">
       <h5 className="text-xl font-bold mt-4">{article.title}</h5>
@@ -40,14 +38,10 @@ const Card: React.FC<CardProps> = ({ article, onArticleClick, selected }) => (
           Read More
         </button>
         <button
-          className={`button ${
-            selected
-              ? "bg-red-500 hover:bg-red-700"
-              : "bg-green-500 hover:bg-green-700"
-          } text-white font-bold py-2 px-4 rounded mt-4`}
+          className="button bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
           onClick={() => onArticleClick(article)}
         >
-          {selected ? "Remove" : "Add"}
+          Add
         </button>
       </div>
     </div>
@@ -73,10 +67,7 @@ export default function ClientComponent({ articles }: { articles: Article[] }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        articles: selectedArticles,
-        sponsor: sponsorDescription,
-      }),
+      body: JSON.stringify({ articles: selectedArticles, sponsor: sponsorDescription }),
     });
 
     const data = await res.json();
@@ -105,14 +96,14 @@ export default function ClientComponent({ articles }: { articles: Article[] }) {
       </div>
 
       {/* Right column */}
-      <div className="space-y-4">
+      <div>
+        <h1>Describe sponsor (optional)</h1>
+        <p>
+          Describe the sponsor of the article here. This section is optional.
+        </p>
+        <input type="text" placeholder="Sponsor" className="input" value={sponsorDescription} onChange={(e) => setSponsorDescription(e.target.value)} />
+
         <h1 className="text-4xl font-bold mb-10">Selected Articles</h1>
-        <Input
-          type="text"
-          placeholder="Describe the sponsor of the article here. This section is optional."
-          value={sponsorDescription}
-          onChange={(e) => setSponsorDescription(e.target.value)}
-        />
         <div className="flex justify-between mb-4">
           <button
             className="button bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-4"
@@ -189,7 +180,6 @@ export default function ClientComponent({ articles }: { articles: Article[] }) {
               <Card
                 key={index}
                 article={article}
-                selected={true}
                 onArticleClick={() =>
                   setSelectedArticles((prev) =>
                     prev.filter((a) => a.title !== article.title)

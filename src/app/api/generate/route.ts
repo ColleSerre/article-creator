@@ -1,8 +1,8 @@
 import OpenAI from "openai";
 
 export async function POST(req: Request) {
-  const selectedArticles: {
-    selectedArticles: {
+  const payload: {
+    articles: {
       source: {
         id: string | null;
         name: string;
@@ -14,9 +14,12 @@ export async function POST(req: Request) {
       url: string;
       content: string;
     }[];
+    sponsor: string;
   } = await req.json();
 
-  console.log(selectedArticles);
+  const selectedArticles = payload.articles;
+  const sponsorDescription = payload.sponsor;
+
 
   if (!selectedArticles) {
     return new Response("Invalid request", {
@@ -32,17 +35,17 @@ export async function POST(req: Request) {
       }
     );
   }
-  console.log(process.env.NEXT_PUBLIC_OPENAI_API_KEY);
 
   const client = new OpenAI({
     apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
   });
 
   try {
-    let articlesContent =
-      "use slash n for newline, structure it using markdown Do a daily news roundup on\n";
+    let articlesContent = `You are writing a linkedin fintech news roundup in a fun/professional tone ${
+      sponsorDescription == "" ? "" : `sponsored by: ${sponsorDescription}`
+    } use slash n for newline, Linkedin has link previews so simply quote the source at the end or beginnging of each story using (Source: link). Do a daily news roundup on\n`;
 
-    selectedArticles.selectedArticles.forEach((article) => {
+    selectedArticles.forEach((article) => {
       articlesContent +=
         "Article: " +
         article.title +
@@ -66,7 +69,7 @@ export async function POST(req: Request) {
           content: articlesContent,
         },
       ],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
     });
 
     if (chatCompletion.choices.length === 0) {
