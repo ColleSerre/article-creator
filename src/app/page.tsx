@@ -11,10 +11,6 @@ async function getArticles() {
   }
 
   // Technology
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const technologyPromise = fetch(
-    `https://newsapi.org/v2/top-headlines?country=us&category=technology&sortBy=popularity&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`
-  );
 
   // Business
   const businessPromise = fetch(
