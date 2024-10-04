@@ -1,6 +1,6 @@
 import { NextApiResponse } from "next";
 
-export default async function GET(res: NextApiResponse) {
+export async function GET(res: NextApiResponse) {
   if (!process.env.NEXT_PUBLIC_NEWSCATCHER_API_KEY) {
     res.status(500).json({ error: "API key not found" });
   } else {
