@@ -1,4 +1,4 @@
-export async function GET(res: Response) {
+export async function GET() {
   if (!process.env.NEXT_PUBLIC_NEWSCATCHER_API_KEY) {
     return new Response("API key not found", { status: 500 });
   } else {
