@@ -1,25 +1,14 @@
+import { Article } from "@/app/ClientComponent";
 import OpenAI from "openai";
 
 export async function POST(req: Request) {
   const payload: {
-    articles: {
-      source: {
-        id: string | null;
-        name: string;
-      };
-      author: string | null;
-      title: string;
-      description: string;
-      urlToImage: string;
-      url: string;
-      content: string;
-    }[];
+    articles: Article[];
     sponsor: string;
   } = await req.json();
 
   const selectedArticles = payload.articles;
   const sponsorDescription = payload.sponsor;
-
 
   if (!selectedArticles) {
     return new Response("Invalid request", {
@@ -45,22 +34,9 @@ export async function POST(req: Request) {
       sponsorDescription == "" ? "" : `sponsored by: ${sponsorDescription}`
     } use slash n for newline, Linkedin has link previews so simply quote the source at the end or beginnging of each story using (Source: link). Do a daily news roundup on\n`;
 
-    selectedArticles.forEach((article) => {
-      articlesContent +=
-        "Article: " +
-        article.title +
-        " " +
-        article.source.name +
-        " " +
-        article.description +
-        " " +
-        article.url +
-        " " +
-        article.content +
-        " " +
-        article.urlToImage +
-        "\n";
-    });
+    for (const article of selectedArticles) {
+      articlesContent += `${article.title} ${article.author} ${article.excerpt} ${article.link} ${article.summary}\n`;
+    }
 
     const chatCompletion = await client.chat.completions.create({
       messages: [

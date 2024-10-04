@@ -1,74 +1,66 @@
-// app/results/[slug]/page.tsx
+// pages/results.tsx
+import ClientComponent, { Article } from "./ClientComponent";
 
-import ClientComponent from "./ClientComponent";
+async function getLatestStories(): Promise<{
+  data: {
+    status: string;
+    total_hits: number;
+    articles: Article[];
+  } | null;
+  error: string | null;
+}> {
+  if (!process.env.NEXT_PUBLIC_NEWSCATCHER_API_KEY) {
+    return { data: null, error: "API key not found" };
+  } else {
+    const urlWithParams = new URL("https://api.newscatcherapi.com/v2/search");
+    urlWithParams.searchParams.append("q", "(Fintech) OR (Finance AND Tech)");
+    urlWithParams.searchParams.append("lang", "en");
+    urlWithParams.searchParams.append("sort_by", "relevancy");
+    urlWithParams.searchParams.append("page", "1");
 
-// This is a server component
-async function getArticles() {
-  // Fetch articles from the News API
+    const response = await fetch(urlWithParams.toString(), {
+      method: "GET",
+      headers: {
+        "x-api-key": process.env.NEXT_PUBLIC_NEWSCATCHER_API_KEY,
+      },
+    });
 
-  if (!process.env.NEXT_PUBLIC_NEWS_API_KEY) {
-    throw new Error("News API key not found");
-  }
+    if (response.status !== 200) {
+      return { data: null, error: "Failed to fetch latest stories" };
+    }
 
-  // Technology
+    const data = await response.json();
 
-  // Business
-  const businessPromise = fetch(
-    `https://newsapi.org/v2/top-headlines?country=us&category=business&sortBy=popularity&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`
-  );
-
-  // Fintech
-  const fintechPromise = fetch(
-    `https://newsapi.org/v2/everything?q=fintech&from=2024-09-21&sortBy=popularity&language=en&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`
-  );
-
-  const [businessRes, fintechRes] = await Promise.all([
-    businessPromise,
-    fintechPromise,
-  ]);
-
-  const responses = [businessRes, fintechRes];
-  const validResponses = responses.filter((res) => res.ok);
-
-  const articles = (await Promise.all(validResponses.map((res) => res.json())))
-    .flatMap((data) => data.articles)
-    .removeDuplicates()
-    .randomize();
-
-  return articles;
-}
-
-// Server component that fetches articles and renders the ClientComponent
-declare global {
-  interface Array<T> {
-    randomize(): T[];
+    return {
+      data: data,
+      error: response.status !== 200 ? "Failed to fetch latest stories" : null,
+    };
   }
 }
-
-declare global {
-  interface Array<T> {
-    randomize(): T[];
-    removeDuplicates(): T[];
-  }
-}
-
-Array.prototype.randomize = function () {
-  return this.sort(() => Math.random() - 0.5);
-};
-
-Array.prototype.removeDuplicates = function () {
-  return this.filter(
-    (value, index, self) =>
-      self.findIndex((article) => article.title === value.title) === index
-  );
-};
 
 export default async function Results() {
-  const data = await getArticles();
-  // Pass articles to ClientComponent
+  const { data, error } = await getLatestStories();
+
+  if (!data) {
+    return (
+      <main className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+        <p className="text-red-500">{error}</p>
+      </main>
+    );
+  }
+
+  if (!data) {
+    return (
+      <main className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+        <p className="text-red-500">{error}</p>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <ClientComponent articles={data} />
+      {error && <p className="text-red-500">{error}</p>}
+      <ClientComponent articles={data.articles} />
     </main>
   );
 }
