@@ -1,8 +1,6 @@
-import { NextApiResponse } from "next";
-
-export async function GET(res: NextApiResponse) {
+export async function GET(res: Response) {
   if (!process.env.NEXT_PUBLIC_NEWSCATCHER_API_KEY) {
-    res.status(500).json({ error: "API key not found" });
+    return new Response("API key not found", { status: 500 });
   } else {
     const options = {
       method: "GET",
@@ -26,9 +24,9 @@ export async function GET(res: NextApiResponse) {
     });
 
     if (response.status !== 200) {
-      res.status(500).json({ error: "Failed to fetch latest stories" });
+      return new Response("Failed to fetch latest stories", { status: 500 });
     }
 
-    res.status(200).json({ data: response.json() });
+    return new Response(await response.text(), { status: 200 });
   }
 }
