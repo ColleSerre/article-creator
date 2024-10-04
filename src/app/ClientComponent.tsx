@@ -23,9 +23,10 @@ export interface Article {
 interface CardProps {
   article: Article;
   onArticleClick: (article: Article) => void;
+  selected?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({ article, onArticleClick }) => (
+const Card: React.FC<CardProps> = ({ article, onArticleClick, selected }) => (
   <div className="flex flex-row bg-gray-800 mb-4">
     <div className="flex flex-col justify-between h-full p-4 overflow-hidden">
       <h5 className="text-xl font-bold mt-4">{article.title}</h5>
@@ -42,10 +43,14 @@ const Card: React.FC<CardProps> = ({ article, onArticleClick }) => (
           Read More
         </button>
         <button
-          className="button bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
+          className={`button ${
+            selected
+              ? " bg-red-500 hover:bg-red-700"
+              : "bg-green-500 hover:bg-green-700"
+          } text-white font-bold py-2 px-4 rounded mt-4`}
           onClick={() => onArticleClick(article)}
         >
-          Add
+          {selected ? "Remove" : "Select"}
         </button>
       </div>
     </div>
@@ -193,6 +198,7 @@ export default function ClientComponent({ articles }: { articles: Article[] }) {
               <Card
                 key={index}
                 article={article}
+                selected
                 onArticleClick={() =>
                   setSelectedArticles((prev) =>
                     prev.filter((a) => a.title !== article.title)
